@@ -1,0 +1,36 @@
+#include <stdio.h>
+#define QTD_ESTADOS 26
+
+struct Estado {
+    char nome[30];
+    int veiculos;
+    int acidentes;
+};
+
+void coletarDados(struct Estado estados[], int tamanho) {
+    int i;
+    for (i = 0; i < tamanho; i++) {
+        printf("\n=== Estado %d ===\n", i + 1);
+
+        printf("Nome do estado (sem espacos): ");
+        scanf("%s", estados[i].nome);
+
+        printf("Numero de veiculos (em 2007): ");
+        scanf("%d", &estados[i].veiculos);
+
+        printf("Numero de acidentes (em 2007): ");
+        scanf("%d", &estados[i].acidentes);
+    }
+}
+
+int main() {
+    struct Estado estados[QTD_ESTADOS];
+    
+    printf("COLETA DE DADOS - ACIDENTES DE TRANSITO\n");
+
+    coletarDados(estados, QTD_ESTADOS);
+
+    printf("\nDADOS COLETADOS COM SUCESSO!\n");
+
+    return 0;
+}
