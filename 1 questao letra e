@@ -1,0 +1,44 @@
+#include <stdio.h>
+
+#define MAX 26
+
+struct Estado {
+    char nome[30];
+    int veiculos;
+    int acidentes;
+};
+
+void acimaDaMedia(struct Estado cad[], int n, float media) {
+    int i;
+    printf("\nEstados com acidentes acima da media (%.2f):\n", media);
+    for (i = 0; i < n; i++) {
+        if (cad[i].acidentes > media) {
+            printf("%s - %d acidentes\n", cad[i].nome, cad[i].acidentes);
+        }
+    }
+}
+
+int main() {
+    struct Estado cad[MAX];
+    int i, n;
+    float soma = 0, media;
+
+    printf("Quantos estados deseja cadastrar? ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("\nNome do estado: ");
+        scanf("%s", cad[i].nome);
+        printf("Numero de veiculos: ");
+        scanf("%d", &cad[i].veiculos);
+        printf("Numero de acidentes: ");
+        scanf("%d", &cad[i].acidentes);
+        soma += cad[i].acidentes;
+    }
+
+    media = soma / n;
+
+    acimaDaMedia(cad, n, media);
+
+    return 0;
+}
