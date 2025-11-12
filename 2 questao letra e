@@ -1,0 +1,216 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 40
+
+struct Produto {
+    int codigo;
+    char descricao[50];
+    float valorUnitario;
+    int quantidade;
+};
+
+void cadastrarProduto(struct Produto produtos[], int *quantidadeAtual) {
+    if (*quantidadeAtual >= MAX_PRODUTOS) {
+        printf("\nLimite de produtos atingido!\n");
+        return;
+    }
+
+    struct Produto novo;
+
+    printf("\n=== Cadastro de Novo Produto ===\n");
+    printf("Código: ");
+    scanf("%d", &novo.codigo);
+    getchar();
+
+    printf("Descrição: ");
+    fgets(novo.descricao, 50, stdin);
+    novo.descricao[strcspn(novo.descricao, "\n")] = '\0';
+
+    printf("Valor unitário: ");
+    scanf("%f", &novo.valorUnitario);
+
+    printf("Quantidade em estoque: ");
+    scanf("%d", &novo.quantidade);
+
+    produtos[*quantidadeAtual] = novo;
+    (*quantidadeAtual)++;
+
+    printf("\nProduto cadastrado com sucesso!\n");
+}
+
+void alterarValorUnitario(struct Produto produtos[], int quantidadeAtual) {
+    int codigo;
+    int encontrado = 0;
+
+    printf("\n=== Alterar Valor Unitário ===\n");
+    printf("Informe o código do produto: ");
+    scanf("%d", &codigo);
+
+    for (int i = 0; i < quantidadeAtual; i++) {
+        if (produtos[i].codigo == codigo) {
+            printf("Produto encontrado: %s (valor atual: R$ %.2f)\n",
+                   produtos[i].descricao, produtos[i].valorUnitario);
+            printf("Informe o novo valor unitário: ");
+            scanf("%f", &produtos[i].valorUnitario);
+            printf("\nValor alterado com sucesso!\n");
+            encontrado = 1;
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        printf("\nProduto com código %d não encontrado.\n", codigo);
+    }
+}
+
+float consultarValorUnitario(struct Produto produtos[], int quantidadeAtual, int codigo) {
+    for (int i = 0; i < quantidadeAtual; i++) {
+        if (produtos[i].codigo == codigo) {
+            return produtos[i].valorUnitario;
+        }
+    }
+    return -1;
+}
+
+int consultarQuantidadeEstoque(struct Produto produtos[], int quantidadeAtual, int codigo) {
+    for (int i = 0; i < quantidadeAtual; i++) {
+        if (produtos[i].codigo == codigo) {
+            return produtos[i].quantidade;
+        }
+    }
+    return -1;
+}
+
+void realizarVenda(struct Produto produtos[], int quantidadeAtual) {
+    int codigo, quantidadeDesejada, encontrado = 0;
+    char opcao;
+
+    printf("\n=== Procedimento de Venda ===\n");
+    printf("Informe o código do produto: ");
+    scanf("%d", &codigo);
+
+    for (int i = 0; i < quantidadeAtual; i++) {
+        if (produtos[i].codigo == codigo) {
+            encontrado = 1;
+
+            if (produtos[i].quantidade == 0) {
+                printf("\nProduto '%s' está com estoque zero.\n", produtos[i].descricao);
+                return;
+            }
+
+            printf("Produto: %s\n", produtos[i].descricao);
+            printf("Estoque atual: %d unidades\n", produtos[i].quantidade);
+            printf("Valor unitário: R$ %.2f\n", produtos[i].valorUnitario);
+            printf("Informe a quantidade desejada: ");
+            scanf("%d", &quantidadeDesejada);
+
+            if (quantidadeDesejada <= 0) {
+                printf("\nQuantidade inválida!\n");
+                return;
+            }
+
+            if (quantidadeDesejada <= produtos[i].quantidade) {
+                produtos[i].quantidade -= quantidadeDesejada;
+                float valorTotal = quantidadeDesejada * produtos[i].valorUnitario;
+                printf("\nVenda realizada com sucesso!\n");
+                printf("Valor a pagar: R$ %.2f\n", valorTotal);
+            } 
+            else {
+                printf("\nQuantidade desejada maior que o estoque disponível.\n");
+                printf("Deseja efetivar a compra com as %d unidades restantes? (S/N): ", produtos[i].quantidade);
+                getchar();
+                scanf("%c", &opcao);
+
+                if (opcao == 'S' || opcao == 's') {
+                    float valorTotal = produtos[i].quantidade * produtos[i].valorUnitario;
+                    printf("\nVenda realizada com sucesso!\n");
+                    printf("Valor a pagar: R$ %.2f\n", valorTotal);
+                    produtos[i].quantidade = 0;
+                } else {
+                    printf("\nVenda cancelada.\n");
+                }
+            }
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        printf("\nProduto com código %d não encontrado.\n", codigo);
+    }
+}
+
+int main() {
+    struct Produto produtos[MAX_PRODUTOS];
+    int quantidadeAtual = 0;
+    int opcao, codigo, qtd;
+    float valor;
+
+    do {
+        printf("\n==== MENU ====\n");
+        printf("1 - Cadastrar novo produto\n");
+        printf("2 - Listar produtos cadastrados\n");
+        printf("3 - Alterar valor unitário\n");
+        printf("4 - Consultar valor unitário\n");
+        printf("5 - Consultar quantidade em estoque\n");
+        printf("6 - Realizar venda\n");
+        printf("0 - Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar();
+
+        switch (opcao) {
+            case 1:
+                cadastrarProduto(produtos, &quantidadeAtual);
+                break;
+
+            case 2:
+                printf("\n=== Produtos Cadastrados ===\n");
+                for (int i = 0; i < quantidadeAtual; i++) {
+                    printf("Código: %d\n", produtos[i].codigo);
+                    printf("Descrição: %s\n", produtos[i].descricao);
+                    printf("Valor: R$ %.2f\n", produtos[i].valorUnitario);
+                    printf("Quantidade: %d\n\n", produtos[i].quantidade);
+                }
+                break;
+
+            case 3:
+                alterarValorUnitario(produtos, quantidadeAtual);
+                break;
+
+            case 4:
+                printf("\nInforme o código do produto: ");
+                scanf("%d", &codigo);
+                valor = consultarValorUnitario(produtos, quantidadeAtual, codigo);
+                if (valor != -1)
+                    printf("Valor unitário: R$ %.2f\n", valor);
+                else
+                    printf("Produto não encontrado.\n");
+                break;
+
+            case 5:
+                printf("\nInforme o código do produto: ");
+                scanf("%d", &codigo);
+                qtd = consultarQuantidadeEstoque(produtos, quantidadeAtual, codigo);
+                if (qtd != -1)
+                    printf("Quantidade em estoque: %d unidades\n", qtd);
+                else
+                    printf("Produto não encontrado.\n");
+                break;
+
+            case 6:
+                realizarVenda(produtos, quantidadeAtual);
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\nOpção inválida!\n");
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
