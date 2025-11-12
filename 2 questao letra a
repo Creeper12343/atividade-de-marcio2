@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 40
+
+struct Produto {
+    int codigo;
+    char descricao[50];
+    float valorUnitario;
+    int quantidade;
+};
+
+void cadastrarProduto(struct Produto produtos[], int *quantidadeAtual) {
+    if (*quantidadeAtual >= MAX_PRODUTOS) {
+        printf("\n❌ Limite de produtos atingido!\n");
+        return;
+    }
+
+    struct Produto novo;
+
+    printf("\n=== Cadastro de Novo Produto ===\n");
+    printf("Código: ");
+    scanf("%d", &novo.codigo);
+    getchar();
+
+    printf("Descrição: ");
+    fgets(novo.descricao, 50, stdin);
+    novo.descricao[strcspn(novo.descricao, "\n")] = '\0'; 
+
+    printf("Valor unitário: ");
+    scanf("%f", &novo.valorUnitario);
+
+    printf("Quantidade em estoque: ");
+    scanf("%d", &novo.quantidade);
+
+    produtos[*quantidadeAtual] = novo;
+    (*quantidadeAtual)++;
+
+    printf("\n✅ Produto cadastrado com sucesso!\n");
+}
+
+int main() {
+    struct Produto produtos[MAX_PRODUTOS];
+    int quantidadeAtual = 0;
+    int opcao;
+
+    do {
+        printf("\n==== MENU ====\n");
+        printf("1 - Cadastrar novo produto\n");
+        printf("2 - Listar produtos cadastrados\n");
+        printf("0 - Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar(); 
+
+        switch (opcao) {
+            case 1:
+                cadastrarProduto(produtos, &quantidadeAtual);
+                break;
+
+            case 2:
+                printf("\n=== Produtos Cadastrados ===\n");
+                for (int i = 0; i < quantidadeAtual; i++) {
+                    printf("Código: %d\n", produtos[i].codigo);
+                    printf("Descrição: %s\n", produtos[i].descricao);
+                    printf("Valor: R$ %.2f\n", produtos[i].valorUnitario);
+                    printf("Quantidade: %d\n\n", produtos[i].quantidade);
+                }
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\nOpção inválida!\n");
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
