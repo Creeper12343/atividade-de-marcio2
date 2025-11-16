@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 50
+
+struct Conta {
+    int numero;
+    char nome[50];
+    char cpf[20];
+    char telefone[20];
+    float saldo;
+};
+
+int buscar(struct Conta v[], int t, int num) {
+    int i;
+    if (t == 0) return -1;
+    for (i = 0; i < t; i++)
+        if (v[i].numero == num) return i;
+    return -2;
+}
+
+void ler(char *s, int n) {
+    fgets(s, n, stdin);
+    s[strcspn(s, "\n")] = 0;
+}
+
+void cadastrarConta(struct Conta v[], int *t, int numero) {
+    int pos = buscar(v, *t, numero);
+    if (pos >= 0) {
+        printf("Numero repetido\n");
+        return;
+    }
+
+    struct Conta c;
+    c.numero = numero;
+
+    getchar();
+    printf("Nome: ");
+    ler(c.nome, 50);
+
+    printf("CPF: ");
+    ler(c.cpf, 20);
+
+    printf("Telefone: ");
+    ler(c.telefone, 20);
+
+    printf("Saldo inicial: ");
+    scanf("%f", &c.saldo);
+
+    v[*t] = c;
+    (*t)++;
+
+    printf("Conta cadastrada\n");
+}
+
+void consultarSaldo(struct Conta v[], int t, int numero) {
+    int pos = buscar(v, t, numero);
+    if (pos >= 0)
+        printf("Saldo: %.2f\n", v[pos].saldo);
+    else
+        printf("Conta nao cadastrada\n");
+}
+
+void depositar(struct Conta v[], int t, int numero) {
+    int pos = buscar(v, t, numero);
+    if (pos < 0) {
+        printf("Conta nao cadastrada\n");
+        return;
+    }
+
+    float valor;
+    printf("Valor do deposito: ");
+    scanf("%f", &valor);
+
+    if (valor <= 0) {
+        printf("Valor invalido\n");
+        return;
+    }
+
+    v[pos].saldo += valor;
+    printf("Deposito realizado. Novo saldo: %.2f\n", v[pos].saldo);
+}
+
+void listar(struct Conta v[], int t) {
+    int i;
+    if (t == 0) {
+        printf("Vazio\n");
+        return;
+    }
+    for (i = 0; i < t; i++)
+        printf("%d %s %.2f\n", v[i].numero, v[i].nome, v[i].saldo);
+}
+
+int main() {
+    struct Conta contas[MAX];
+    int total = 0;
+    int op, num;
+
+    do {
+        printf("\n1 Cadastrar\n2 Consultar saldo\n3 Depositar\n4 Listar\n5 Sair\n");
+        scanf("%d", &op);
+
+        if (op == 1) {
+            printf("Numero da conta: ");
+            scanf("%d", &num);
+            cadastrarConta(contas, &total, num);
+        }
+        else if (op == 2) {
+            printf("Numero da conta: ");
+            scanf("%d", &num);
+            consultarSaldo(contas, total, num);
+        }
+        else if (op == 3) {
+            printf("Numero da conta: ");
+            scanf("%d", &num);
+            depositar(contas, total, num);
+        }
+        else if (op == 4) {
+            listar(contas, total);
+        }
+
+    } while (op != 5);
+
+    return 0;
+}
