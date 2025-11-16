@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 50
+
+struct Conta {
+    int numero;
+    char nome[50];
+    char cpf[20];
+    char telefone[20];
+    float saldo;
+};
+
+int buscar(struct Conta v[], int t, int num) {
+    int i;
+    if (t == 0) return -1;
+    for (i=0;i<t;i++)
+        if (v[i].numero == num)
+            return i;
+    return -2;
+}
+
+void ler(char *s, int n) {
+    fgets(s, n, stdin);
+    s[strcspn(s, "\n")] = 0;
+}
+
+void inserir(struct Conta v[], int *t) {
+    if (*t >= MAX) return;
+    struct Conta c;
+    printf("Numero: ");
+    scanf("%d",&c.numero);
+    getchar();
+    printf("Nome: ");
+    ler(c.nome,50);
+    printf("CPF: ");
+    ler(c.cpf,20);
+    printf("Telefone: ");
+    ler(c.telefone,20);
+    printf("Saldo: ");
+    scanf("%f",&c.saldo);
+    getchar();
+    v[*t] = c;
+    (*t)++;
+}
+
+void listar(struct Conta v[], int t) {
+    int i;
+    if (t==0) { printf("Vazio\n"); return; }
+    for (i=0;i<t;i++)
+        printf("%d %s %s %s %.2f\n", v[i].numero, v[i].nome, v[i].cpf, v[i].telefone, v[i].saldo);
+}
+
+int main() {
+    struct Conta cc[MAX], cp[MAX];
+    int tc=0, tp=0;
+    int op, tipo, num, pos;
+
+    do {
+        printf("\n1 Inserir CC\n2 Inserir CP\n3 Buscar CC\n4 Buscar CP\n5 Listar CC\n6 Listar CP\n7 Sair\n");
+        scanf("%d",&op);
+        getchar();
+
+        if (op==1) inserir(cc,&tc);
+        else if (op==2) inserir(cp,&tp);
+        else if (op==3) {
+            printf("Numero: ");
+            scanf("%d",&num);
+            getchar();
+            pos = buscar(cc,tc,num);
+            printf("%d\n",pos);
+        }
+        else if (op==4) {
+            printf("Numero: ");
+            scanf("%d",&num);
+            getchar();
+            pos = buscar(cp,tp,num);
+            printf("%d\n",pos);
+        }
+        else if (op==5) listar(cc,tc);
+        else if (op==6) listar(cp,tp);
+
+    } while (op != 7);
+
+    return 0;
+}
