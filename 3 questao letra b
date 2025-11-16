@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 50
+
+struct Conta {
+    int numero;
+    char nome[50];
+    char cpf[20];
+    char telefone[20];
+    float saldo;
+};
+
+int buscar(struct Conta v[], int t, int num) {
+    int i;
+    if (t == 0) return -1;
+    for (i = 0; i < t; i++)
+        if (v[i].numero == num) return i;
+    return -2;
+}
+
+int existeNoBanco(struct Conta a[], int ta, struct Conta b[], int tb, int num) {
+    if (buscar(a, ta, num) >= 0) return 1;
+    if (buscar(b, tb, num) >= 0) return 1;
+    return 0;
+}
+
+void ler(char *s, int n) {
+    if (fgets(s, n, stdin) == NULL) { s[0] = 0; return; }
+    s[strcspn(s, "\n")] = 0;
+}
+
+void cadastrarConta(struct Conta v[], int *t, struct Conta outros[], int to, int numero) {
+    if (*t >= MAX) { printf("Cadastro cheio\n"); return; }
+    if (existeNoBanco(v, *t, outros, to, numero)) { printf("Numero ja cadastrado\n"); return; }
+    struct Conta c;
+    c.numero = numero;
+    getchar();
+    printf("Nome: ");
+    ler(c.nome, 50);
+    printf("CPF: ");
+    ler(c.cpf, 20);
+    printf("Telefone: ");
+    ler(c.telefone, 20);
+    printf("Saldo: ");
+    if (scanf("%f", &c.saldo) != 1) { printf("Entrada invalida\n"); getchar(); return; }
+    getchar();
+    v[*t] = c;
+    (*t)++;
+    printf("Conta cadastrada\n");
+}
+
+void listar(struct Conta v[], int t) {
+    int i;
+    if (t == 0) { printf("Vazio\n"); return; }
+    for (i = 0; i < t; i++)
+        printf("%d %s %s %s %.2f\n", v[i].numero, v[i].nome, v[i].cpf, v[i].telefone, v[i].saldo);
+}
+
+int main() {
+    struct Conta cc[MAX], cp[MAX];
+    int tc = 0, tp = 0;
+    int op;
+    do {
+        printf("\n1 Inserir CC\n2 Inserir CP\n3 Buscar\n4 Listar CC\n5 Listar CP\n6 Sair\n");
+        if (scanf("%d", &op) != 1) { printf("Entrada invalida\n"); return 0; }
+        if (op == 1) {
+            int num;
+            printf("Numero da nova conta corrente: ");
+            if (scanf("%d", &num) != 1) { printf("Entrada invalida\n"); return 0; }
+            cadastrarConta(cc, &tc, cp, tp, num);
+        } else if (op == 2) {
+            int num;
+            printf("Numero da nova conta poupanca: ");
+            if (scanf("%d", &num) != 1) { printf("Entrada invalida\n"); return 0; }
+            cadastrarConta(cp, &tp, cc, tc, num);
+        } else if (op == 3) {
+            int num;
+            printf("Numero a buscar: ");
+            if (scanf("%d", &num) != 1) { printf("Entrada invalida\n"); return 0; }
+            int p = buscar(cc, tc, num);
+            if (p >= 0) { printf("Encontrada em CC pos %d: %s %.2f\n", p, cc[p].nome, cc[p].saldo); continue; }
+            p = buscar(cp, tp, num);
+            if (p >= 0) { printf("Encontrada em CP pos %d: %s %.2f\n", p, cp[p].nome, cp[p].saldo); continue; }
+            if (tc == 0 && tp == 0) printf("Ambos cadastros vazios\n"); else printf("Nao encontrada\n");
+        } else if (op == 4) listar(cc, tc);
+        else if (op == 5) listar(cp, tp);
+        else if (op == 6) break;
+    } while (1);
+    return 0;
+}
